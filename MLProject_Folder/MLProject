@@ -1,5 +1,5 @@
-name: Iris_Training_Project
+name: iris-ml-project
 
 entry_points:
   main:
-    command: "python modelling_tuning.py"
+    command: "python modelling.py"
