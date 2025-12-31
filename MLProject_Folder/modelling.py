@@ -39,6 +39,9 @@ def run_modelling():
         joblib.dump(model, "model.pkl")
         mlflow.log_artifact("model.pkl")
         mlflow.sklearn.log_model(model, "tuned_iris_model")
+        mlflow.sklearn.save_model(model, "tuned_iris_model_local")
+
+
 
 if __name__ == "__main__":
     run_modelling()
