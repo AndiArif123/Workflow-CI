@@ -1,16 +1,18 @@
+import os
 import pandas as pd
 import mlflow
 import mlflow.sklearn
 import dagshub
-import os
 import joblib
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 
+token = os.getenv("MLFLOW_TRACKING_PASSWORD") 
 repo_owner = 'AndiArif123'
 repo_name = 'Eksperimen_SML_Andi-Arif-Abdillah'
 
-dagshub.init(repo_owner=repo_owner, repo_name=repo_name, mlflow=True)
+os.environ['MLFLOW_TRACKING_USERNAME'] = repo_owner
+os.environ['MLFLOW_TRACKING_PASSWORD'] = token
 mlflow.set_tracking_uri(f"https://dagshub.com/{repo_owner}/{repo_name}.mlflow")
 
 mlflow.sklearn.autolog()
