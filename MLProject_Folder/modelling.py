@@ -31,7 +31,7 @@ def run_modelling():
         X, y, test_size=0.2, random_state=42, stratify=y
     )
 
-    with mlflow.start_run(run_name="CI_Automated_Training") as run:
+    with mlflow.start_run(run_name="CI_Automated_Training", nested=False) as run:
         model = RandomForestClassifier(n_estimators=100, random_state=42)
         model.fit(X_train, y_train)
 
