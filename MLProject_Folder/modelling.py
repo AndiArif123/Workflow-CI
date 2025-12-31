@@ -22,7 +22,7 @@ csv_path = 'iris_preprocessing.csv'
 if not os.path.exists(csv_path):
     raise FileNotFoundError(f"File {csv_path} tidak ditemukan!")
 
-with mlflow.start_run():
+with mlflow.start_run(nested=True):
     df = pd.read_csv(csv_path)
     X = df.drop('target', axis=1)
     y = df['target']
