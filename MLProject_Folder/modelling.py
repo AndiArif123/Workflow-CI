@@ -19,16 +19,17 @@ def run_modelling():
     y = df['target']
     X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=42)
 
-    with mlflow.start_run(run_name="CI_Retraining_Model"):
+    with mlflow.start_run(run_name="CI_Retraining_Model", nested=True):
         model = RandomForestClassifier(n_estimators=100, random_state=42)
         model.fit(X_train, y_train)
         
-        # Simpan file artefak untuk GitHub Artifacts
         joblib.dump(model, "model.pkl")
         
         if os.path.exists("model_output"):
             shutil.rmtree("model_output")
         mlflow.sklearn.save_model(model, "model_output")
+    
+        mlflow.sklearn.log_model(model, "tuned_iris_model")
 
 if __name__ == "__main__":
     run_modelling()
