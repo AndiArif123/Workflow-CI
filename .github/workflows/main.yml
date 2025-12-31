@@ -29,7 +29,7 @@ jobs:
           mlflow run MLProject_Folder/ -e main
 
       - name: Upload Artifacts to GitHub
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ml-model-artifacts
           path: |
