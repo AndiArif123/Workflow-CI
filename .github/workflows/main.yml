@@ -20,13 +20,13 @@ jobs:
         run: |
           pip install mlflow dagshub pandas scikit-learn joblib mlserver mlserver-mlflow
 
-      - name: Run Training Script
+      - name: Run mlflow project
         env:
+          MLFLOW_TRACKING_USERNAME: AndiArif123
           MLFLOW_TRACKING_PASSWORD: ${{ secrets.DAGSHUB_TOKEN }}
         run: |
-          # Masuk ke folder dan jalankan skripnya langsung
-          cd MLProject_Folder
-          python modelling.py
+          # Perintah WAJIB sesuai instruksi
+          mlflow run . --env-manager=local
 
       - name: Upload Artifacts to GitHub
         uses: actions/upload-artifact@v4
