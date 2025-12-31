@@ -25,7 +25,7 @@ jobs:
           MLFLOW_TRACKING_USERNAME: AndiArif123
           MLFLOW_TRACKING_PASSWORD: ${{ secrets.DAGSHUB_TOKEN }}
         run: |
-          mlflow run . 
+          mlflow run . --env-manager=local
     
 
       - name: Upload Artifacts to GitHub
