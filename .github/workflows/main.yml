@@ -18,7 +18,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install mlflow==2.7.1 dagshub pandas scikit-learn matplotlib seaborn
+          pip install mlflow==2.7.1 dagshub pandas scikit-learn joblib matplotlib seaborn mlserver mlserver-mlflow
 
       - name: Run MLflow Project
         env:
@@ -26,21 +26,24 @@ jobs:
           MLFLOW_TRACKING_PASSWORD: ${{ secrets.DAGSHUB_TOKEN }}
         run: |
           cd MLProject_Folder
-          mlflow run . --env-manager=local
-    
+          mlflow run . --no-conda
 
-      - name: Upload Artifacts to GitHub
+      - name: Upload Artifacts to GitHub (backup)
         uses: actions/upload-artifact@v4
         with:
           name: ml-model-artifacts
           path: |
             MLProject_Folder/model.pkl
             MLProject_Folder/model_output/
+            MLProject_Folder/classification_report.json
 
       - name: Build Docker Image
         run: |
-          # Build docker menggunakan folder yang baru dibuat
-          mlflow models build-docker -m "MLProject_Folder/model_output" -n "andi-iris-model" --enable-mlserver
+          LATEST_RUN=$(mlflow runs list --experiment-name AndiArif --max-results 1 --output json | jq -r '.[0].info.run_id')
+          mlflow models build-docker \
+            -m "runs:/$LATEST_RUN/artifacts/model" \
+            -n "andi-iris-model" \
+            --enable-mlserver
 
       - name: Login to Docker Hub
         uses: docker/login-action@v2
