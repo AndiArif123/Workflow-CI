@@ -26,6 +26,8 @@ jobs:
           MLFLOW_TRACKING_PASSWORD: ${{ secrets.DAGSHUB_TOKEN }}
         run: |
           cd MLProject_Folder
+          # Menghapus paksa ID lama jika ada untuk mencegah konflik
+          unset MLFLOW_RUN_ID 
           mlflow run . --env-manager=local
 
       - name: Upload Artifacts to GitHub (backup)
