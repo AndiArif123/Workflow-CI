@@ -44,8 +44,7 @@ jobs:
           MLFLOW_TRACKING_USERNAME: AndiArif123
           MLFLOW_TRACKING_PASSWORD: ${{ secrets.DAGSHUB_TOKEN }}
         run: |
-          # Berikan jeda agar DagsHub selesai sinkronisasi metadata
-          sleep 10
+          sleep 15
           LATEST_RUN=$(mlflow runs list --experiment-name AndiArif --max-results 1 --output json | jq -r '.[0].info.run_id')
           mlflow models build-docker \
             -m "runs:/$LATEST_RUN/artifacts/model" \
