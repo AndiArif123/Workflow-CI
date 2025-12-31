@@ -17,7 +17,7 @@ os.environ['MLFLOW_TRACKING_PASSWORD'] = os.getenv("MLFLOW_TRACKING_PASSWORD", "
 mlflow.set_tracking_uri(f"https://dagshub.com/{repo_owner}/{repo_name}.mlflow")
 mlflow.set_experiment("AndiArif")
 
-csv_path = 'iris_preprocessing.csv'
+csv_path = 'MLProject_Folder/iris_preprocessing.csv'
 if not os.path.exists(csv_path):
     raise FileNotFoundError(f"File {csv_path} tidak ditemukan!")
 
