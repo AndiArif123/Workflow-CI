@@ -1,11 +1,11 @@
-name: Machine Learning CI Docker
+name: Machine Learning CI
 
 on:
   push:
     branches: [ main ]
 
 jobs:
-  build-and-push:
+  train-and-build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -18,13 +18,14 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install mlflow dagshub pandas scikit-learn joblib mlserver mlserver-mlflow
+          pip install mlflow==2.7.1 dagshub pandas scikit-learn matplotlib seaborn
 
       - name: Run MLflow Project
         env:
           MLFLOW_TRACKING_USERNAME: AndiArif123
           MLFLOW_TRACKING_PASSWORD: ${{ secrets.DAGSHUB_TOKEN }}
         run: |
+          cd MLProject_Folder
           mlflow run . --env-manager=local
     
 
