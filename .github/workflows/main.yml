@@ -33,7 +33,7 @@ jobs:
           name: ml-model-artifacts
           path: |
             model.pkl
-            MLProject_Folder/model_output/
+            model_output/
 
       - name: Build Docker Image
         run: |
