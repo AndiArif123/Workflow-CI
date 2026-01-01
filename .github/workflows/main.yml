@@ -47,13 +47,12 @@ jobs:
           MLFLOW_TRACKING_URI: https://dagshub.com/AndiArif123/Eksperimen_SML_Andi-Arif-Abdillah.mlflow
         run: |
           sleep 15
-          EXP_ID=$(mlflow experiments get-by-name -n AndiArif | grep "Experiment ID" | awk '{print $3}')
-          
-          LATEST_RUN=$(mlflow runs list --experiment-id $EXP_ID --max-results 1 --output json | jq -r '.[0].info.run_id')
+          # Mengambil Run ID menggunakan Python agar lebih stabil antar versi
+          LATEST_RUN=$(python -c "import mlflow; client = mlflow.tracking.MlflowClient(); experiment = client.get_experiment_by_name('AndiArif'); runs = client.search_runs(experiment_ids=[experiment.experiment_id], max_results=1, order_by=['attributes.start_time DESC']); print(runs[0].info.run_id)")
           
           echo "Building Docker for Run ID: $LATEST_RUN"
           
-          # 3. Build docker dengan path model yang benar
+          # Build docker image
           mlflow models build-docker \
             -m "runs:/$LATEST_RUN/model" \
             -n "andi-iris-model" \
