@@ -41,21 +41,21 @@ jobs:
             MLProject_Folder/model_output/
             MLProject_Folder/classification_report.json
 
-      - name: Build Docker Image
+      - name: Build and Push Docker Image
         env:
           MLFLOW_TRACKING_USERNAME: AndiArif123
           MLFLOW_TRACKING_PASSWORD: ${{ secrets.DAGSHUB_TOKEN }}
-          MLFLOW_TRACKING_URI: https://dagshub.com/AndiArif123/Eksperimen_SML_Andi-Arif-Abdillah.mlflow
         run: |
-          sleep 15
-          LATEST_RUN=$(python -c "import mlflow; client = mlflow.tracking.MlflowClient(); experiment = client.get_experiment_by_name('AndiArif'); runs = client.search_runs(experiment_ids=[experiment.experiment_id], max_results=1, order_by=['attributes.start_time DESC']); print(runs[0].info.run_id)")
-          echo "Building Docker for Run ID: $LATEST_RUN"
+          # 1. Masuk ke folder project agar bisa menemukan folder mlruns
+          cd MLProject_Folder
           
-          # Menggunakan base image python 3.9 slim agar lebih ringan dan menghindari bug Java Ubuntu 20.04
+          MODEL_PATH=$(find mlruns -name "model" -type d | head -n 1)
+          echo "Model ditemukan di: $MODEL_PATH"
+          
           mlflow models build-docker \
-            -m "runs:/$LATEST_RUN/model" \
+            -m "$MODEL_PATH" \
             -n "andi-iris-model" \
-            --enable-mlserver
+            --install-mlflow
 
       - name: Login to Docker Hub
         uses: docker/login-action@v3
@@ -65,5 +65,6 @@ jobs:
 
       - name: Push to Docker Hub
         run: |
+          
           docker tag andi-iris-model ${{ secrets.DOCKER_USERNAME }}/andi-iris-model:latest
           docker push ${{ secrets.DOCKER_USERNAME }}/andi-iris-model:latest
