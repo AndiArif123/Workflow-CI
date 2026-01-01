@@ -25,11 +25,9 @@ jobs:
         env:
           MLFLOW_TRACKING_USERNAME: AndiArif123
           MLFLOW_TRACKING_PASSWORD: ${{ secrets.DAGSHUB_TOKEN }}
-          # Paksa menggunakan tracking DagsHub di level CLI
-          MLFLOW_TRACKING_URI: https://dagshub.com/AndiArif123/Eksperimen_SML_Andi-Arif-Abdillah.mlflow
         run: |
           cd MLProject_Folder
-          # Tambahkan retries jika gagal koneksi ke server
+          
           mlflow run . --env-manager=local --experiment-name AndiArif
 
       - name: Upload Artifacts to GitHub (backup)
@@ -45,13 +43,14 @@ jobs:
         env:
           MLFLOW_TRACKING_USERNAME: AndiArif123
           MLFLOW_TRACKING_PASSWORD: ${{ secrets.DAGSHUB_TOKEN }}
+          MLFLOW_TRACKING_URI: https://dagshub.com/AndiArif123/Eksperimen_SML_Andi-Arif-Abdillah.mlflow
         run: |
-          # 1. Masuk ke folder project agar bisa menemukan folder mlruns
           cd MLProject_Folder
-          
-          MODEL_PATH=$(find mlruns -name "model" -type d | head -n 1)
+          # 2. Cari model di folder lokal yang baru saja dibuat
+          MODEL_PATH=$(find mlruns -name "model" -type d | grep "artifacts/model" | head -n 1)
           echo "Model ditemukan di: $MODEL_PATH"
           
+          # 3. Build Docker menggunakan file lokal tersebut
           mlflow models build-docker \
             -m "$MODEL_PATH" \
             -n "andi-iris-model" \
