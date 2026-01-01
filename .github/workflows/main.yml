@@ -1,24 +1,24 @@
-name: Machine Learning CI
+name: Machine Learning Workflow
 
 on:
   push:
     branches: [ main ]
 
 jobs:
-  train-and-build:
+  train-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v4
         with:
           python-version: '3.9'
 
       - name: Install dependencies
         run: |
-          pip install mlflow==2.7.1 dagshub pandas scikit-learn joblib mlserver mlserver-mlflow
+          pip install mlflow==2.7.1 dagshub pandas scikit-learn joblib
           pip install "requests<2.29.0" "urllib3<2.0.0"
 
       - name: Run MLflow Project
@@ -27,42 +27,26 @@ jobs:
           MLFLOW_TRACKING_PASSWORD: ${{ secrets.DAGSHUB_TOKEN }}
         run: |
           cd MLProject_Folder
-          
+          # Jalankan secara lokal agar folder mlruns tercipta di runner
           mlflow run . --env-manager=local --experiment-name AndiArif
 
-      - name: Upload Artifacts to GitHub (backup)
-        uses: actions/upload-artifact@v4
-        with:
-          name: ml-model-artifacts
-          path: |
-            MLProject_Folder/model.pkl
-            MLProject_Folder/model_output/
-            MLProject_Folder/classification_report.json
-
-     - name: Build and Push Docker Image (Manual Mode)
+      - name: Build Docker Image (Manual Mode)
         run: |
           cd MLProject_Folder
-          
-          
+          # Mencari file model.pkl di dalam folder mlruns
           MODEL_FILE=$(find mlruns -name "model.pkl" | head -n 1)
           echo "Model file ditemukan di: $MODEL_FILE"
-          
-          
           cp "$MODEL_FILE" ./model.pkl
           
-          
+          # Buat Dockerfile manual tanpa Java
           cat <<EOF > Dockerfile
           FROM python:3.9-slim
           WORKDIR /app
           COPY model.pkl /app/model.pkl
-
           RUN pip install scikit-learn pandas joblib
-          
-          RUN echo "import joblib; model = joblib.load('model.pkl'); print('Model loaded successfully!')" > test_model.py
-          CMD ["python", "test_model.py"]
+          CMD ["python", "-c", "import joblib; model = joblib.load('model.pkl'); print('Model loaded successfully!')"]
           EOF
-
-
+          
           docker build -t andi-iris-model .
 
       - name: Login to Docker Hub
@@ -73,6 +57,5 @@ jobs:
 
       - name: Push to Docker Hub
         run: |
-          # 5. Tag dan Push ke Docker Hub
           docker tag andi-iris-model ${{ secrets.DOCKER_USERNAME }}/andi-iris-model:latest
           docker push ${{ secrets.DOCKER_USERNAME }}/andi-iris-model:latest
