@@ -44,11 +44,18 @@ jobs:
         env:
           MLFLOW_TRACKING_USERNAME: AndiArif123
           MLFLOW_TRACKING_PASSWORD: ${{ secrets.DAGSHUB_TOKEN }}
+          MLFLOW_TRACKING_URI: https://dagshub.com/AndiArif123/Eksperimen_SML_Andi-Arif-Abdillah.mlflow
         run: |
           sleep 15
-          LATEST_RUN=$(mlflow runs list --experiment-name AndiArif --max-results 1 --output json | jq -r '.[0].info.run_id')
+          EXP_ID=$(mlflow experiments get-by-name -n AndiArif | grep "Experiment ID" | awk '{print $3}')
+          
+          LATEST_RUN=$(mlflow runs list --experiment-id $EXP_ID --max-results 1 --output json | jq -r '.[0].info.run_id')
+          
+          echo "Building Docker for Run ID: $LATEST_RUN"
+          
+          # 3. Build docker dengan path model yang benar
           mlflow models build-docker \
-            -m "runs:/$LATEST_RUN/artifacts/model" \
+            -m "runs:/$LATEST_RUN/model" \
             -n "andi-iris-model" \
             --enable-mlserver
 
