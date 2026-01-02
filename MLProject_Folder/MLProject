@@ -1,4 +1,5 @@
-name: iris-ml-project
+name: Cancer_Project
+conda_env: conda.yaml
 
 entry_points:
   main:
